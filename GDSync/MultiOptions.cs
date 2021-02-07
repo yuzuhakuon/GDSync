@@ -8,7 +8,7 @@ using GDSync.core;
 using Newtonsoft.Json;
 using System.IO;
 
-namespace DotnetCore
+namespace GDSync
 {
     [Verb("display", HelpText = "统计文件夹信息")]
     class DisplayOptions

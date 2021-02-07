@@ -636,4 +636,115 @@ namespace GDSync.core
             dst_uid = form.Params[1];
         }
     }
+
+
+    public class AddSeasonAction : DriveAction
+    {
+        public AddSeasonAction() { }
+        public AddSeasonAction(string dst_folder_uid, string season_count)
+        {
+            dst_uid = dst_folder_uid;
+            this.season_count = season_count;
+        }
+        public override List<DriveAction> CreateNewActions()
+        {
+            List<DriveAction> ActionList = new List<DriveAction>();
+            foreach (var uid in Global.UidFolderList[dst_uid])
+            {
+                var file_info = Global.UidDriveFileInfoPairs[uid];
+                if ((!file_info.IsFolder) && (file_info.Size > 200 * 1024 * 1024))
+                {
+                    ActionList.Add(new MoveFileAction(file_info.Uid, src_uid, dst_uid));
+                }
+            }
+
+
+            return ActionList;
+        }
+
+        public override ActionForm Dump()
+        {
+            var form = new ActionForm()
+            {
+                Name = GetTypeName(),
+                Params = new List<string> { dst_uid, season_count }
+            };
+            return form;
+        }
+
+        public override void Execute(ServiceCard card)
+        {
+            var season_name = $"season {season_count}";
+            bool is_create = true;
+            foreach (var uid in Global.UidFolderList[dst_uid])
+            {
+                if (Global.UidDriveFileInfoPairs[uid].IsFolder && Global.UidDriveFileInfoPairs[uid].Name == season_name)
+                {
+                    var file_info = Global.UidDriveFileInfoPairs[uid];
+                    is_create = false;
+                    src_uid = file_info.Uid;
+                    break;
+                }
+            }
+
+
+            if (is_create)
+            {
+                var result = DriveOp.CreateFolder(card.Service, $"season {season_count}", dst_uid);
+                Global.AddDriveFileInfo(new DriveFileInfo(result));
+                src_uid = result.Id;
+            }
+            Var.logger.Info($"(worker id: {Thread.CurrentThread.ManagedThreadId}) create folder: {season_name}({src_uid}) in {dst_uid}");
+        }
+
+        public override void Load(ActionForm form)
+        {
+            dst_uid = form.Params[0];
+            season_count = form.Params[0];
+        }
+
+
+        private string season_count;
+    }
+
+
+    public class MoveFileAction : DriveAction
+    {
+        public MoveFileAction() { }
+        public MoveFileAction(string src_file_id, string dst_folder_id, string parent)
+        {
+            src_uid = src_file_id;
+            dst_uid = dst_folder_id;
+            this.parent = parent;
+        }
+
+        public override List<DriveAction> CreateNewActions()
+        {
+            List<DriveAction> ActionList = new List<DriveAction>();
+            return ActionList;
+        }
+
+        public override ActionForm Dump()
+        {
+            var form = new ActionForm()
+            {
+                Name = GetTypeName(),
+                Params = new List<string> { src_uid, dst_uid, parent }
+            };
+            return form;
+        }
+
+        public override void Execute(ServiceCard card)
+        {
+            DriveOp.Move(card.Service, src_uid, dst_uid, parent);
+        }
+
+        public override void Load(ActionForm form)
+        {
+            src_uid = form.Params[0];
+            dst_uid = form.Params[1];
+            parent = form.Params[2];
+        }
+        private string parent;
+    }
 }

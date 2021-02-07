@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using GDSync.core;
 using System.IO;
 
-namespace DotnetCore
+namespace GDSync
 {
     public class DriveTasks
     {

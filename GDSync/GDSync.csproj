@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimeOptions.cs" />
     <Compile Include="core\Adventurer.cs" />
     <Compile Include="core\Common.cs" />
     <Compile Include="core\DriveAction.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="core\ServiceCard.cs" />
     <Compile Include="DriveTasks.cs" />
     <Compile Include="MultiOptions.cs" />
+    <Compile Include="MultiTasks\AnimeTask.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

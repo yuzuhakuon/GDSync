@@ -112,6 +112,22 @@ namespace GDSync.core
         }
 
 
+        public static GDFile CreateFolder(DriveService service, string name, string dst_folder_id)
+        {
+            var body = new GDFile();
+            body.Name = name;
+            body.Kind = "drive#folder";
+            body.MimeType = "application/vnd.google-apps.folder";
+            body.Parents = new List<string>() { dst_folder_id };
+
+            FilesResource.CreateRequest createRequest = service.Files.Create(body);
+            createRequest.SupportsAllDrives = true;
+            var result = createRequest.Execute();
+
+            return result;
+        }
+
+
         public static List<GDFile> ListCurrentFiles(DriveService service, string src_folder_id)
         {
             var files = new List<GDFile>();
@@ -152,6 +168,20 @@ namespace GDSync.core
 
 
             FilesResource.UpdateRequest updateRequest = service.Files.Update(body, src_folder_id);
+            updateRequest.SupportsAllDrives = true;
+            var result = updateRequest.Execute();
+            return result;
+        }
+
+
+        public static GDFile Move(DriveService service, string src_file_id, string dst_folder_id, string parent)
+        {
+            var body = new GDFile { };
+
+
+            FilesResource.UpdateRequest updateRequest = service.Files.Update(body, src_file_id);
+            updateRequest.AddParents = dst_folder_id;
+            updateRequest.RemoveParents = parent;
             updateRequest.SupportsAllDrives = true;
             var result = updateRequest.Execute();
             return result;
