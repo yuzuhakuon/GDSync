@@ -175,9 +175,8 @@ namespace GDSync
             publisher.AddAction(new GetAndSearchAction(dst_uid));
             publisher.WaitForStageOver();
 
-
-
-
+            publisher.AddAction(new SameInfoAction(src_uid, dst_uid));
+            publisher.WaitForAllIdle();
         }
     }
 }

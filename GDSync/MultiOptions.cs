@@ -90,6 +90,20 @@ namespace GDSync
     }
 
 
+    [Verb("same-info", HelpText = "信息同步")]
+    class SameInfoOptions
+    {
+        [Option('s', "src", Required = true, HelpText = "源文件夹id")]
+        public string SrcId { get; set; }
+        [Option('d', "dst", Required = true, HelpText = "目标文件夹id")]
+        public string DstId { get; set; }
+        [Option('n', "num-worker", Required = false, HelpText = "工作线程数量")]
+        public int Num { get; set; } = 1;
+        [Option('a', "account-dir", Required = false, HelpText = "账号文件夹")]
+        public string AccountDir { get; set; } = "./account/sa";
+    }
+
+
     partial class Program
     {
         /// <summary>
@@ -245,6 +259,21 @@ namespace GDSync
             SAManage.PreAllocated(num);
 
             DriveTasks.CheckMiss(src_uid, dst_uid);
+            return 0;
+        }
+
+
+        private static int SameInfoSolotion(SameInfoOptions options)
+        {
+            var src_uid = options.SrcId;
+            var dst_uid = options.DstId;
+            var num = options.Num;
+            var account_dir = options.AccountDir;
+
+            SAManage.ReadSAFiles(account_dir);
+            SAManage.PreAllocated(num);
+
+            DriveTasks.SameInfo(src_uid, dst_uid);
             return 0;
         }
     }

@@ -21,22 +21,42 @@ namespace GDSync.core
         /// </summary>
         /// <returns></returns>
         abstract public List<DriveAction> CreateNewActions();
+        /// <summary>
+        /// 将Action信息序列化以便存储到本地磁盘
+        /// </summary>
+        /// <returns></returns>
         abstract public ActionForm Dump();
+        /// <summary>
+        /// 从本地磁盘中导入Action信息
+        /// </summary>
+        /// <param name="form"></param>
         abstract public void Load(ActionForm form);
 
 
+        /// <summary>
+        /// 获取当前类名
+        /// </summary>
+        /// <returns></returns>
         public string GetTypeName()
         {
             return this.GetType().Name;
         }
 
 
+        /// <summary>
+        /// 当出现流量超出错误时, 当前Action指数增加
+        /// </summary>
         public void IncreaseUsageLimitError()
         {
             UsageLimit++;
         }
 
 
+        /// <summary>
+        /// 创建Action, 所有继承本抽象类型的子类都必须包含无参数的默认构造函数
+        /// </summary>
+        /// <param name="actionForms"></param>
+        /// <returns></returns>
         public static List<DriveAction> CreateAllInstancesOf(List<ActionForm> actionForms)
         {
             var instances = new List<DriveAction>();
@@ -71,14 +91,11 @@ namespace GDSync.core
 
 
     /// <summary>
-    /// 创建文件夹
+    /// 创建文件夹, 后续操作为遍历本文件夹
     /// </summary>
     public class CreateFolderAction : DriveAction
     {
-        public CreateFolderAction()
-        {
-
-        }
+        public CreateFolderAction() { }
         public CreateFolderAction(DriveFileInfo src)
         {
             this.src = src;
@@ -471,10 +488,7 @@ namespace GDSync.core
 
     public class RenameAction : DriveAction
     {
-        public RenameAction()
-        {
-
-        }
+        public RenameAction() { }
 
 
         public RenameAction(string src_file_uid, string name)
@@ -521,10 +535,7 @@ namespace GDSync.core
 
     public class SameInfoAction : DriveAction
     {
-        public SameInfoAction()
-        {
-
-        }
+        public SameInfoAction() { }
         public SameInfoAction(string src_folder_uid, string dst_folder_uid)
         {
             src_uid = src_folder_uid;
@@ -543,7 +554,7 @@ namespace GDSync.core
                 {
                     if (src_info == dst_info)
                     {
-                        ActionList.Add(new RenameAction(dst.Uid, src.Name));
+                        ActionList.Add(new RenameAction(dst_info.Uid, src_info.Name));
                         break;
                     }
                 }

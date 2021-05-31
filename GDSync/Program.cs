@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 using System;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace GDSync
 {
@@ -11,6 +13,19 @@ namespace GDSync
     {
         static void Main(string[] args)
         {
+            //Task.Factory.StartNew(() =>
+            //{
+            //    while (true)
+            //    {
+            //        Thread.Sleep(100);
+            //        Console.WriteLine("----------");
+            //        if (Console.KeyAvailable)
+            //        {
+            //            ConsoleKeyInfo key = Console.ReadKey(true);
+            //            Console.WriteLine(key.Key);
+            //        }
+            //    }
+            //});
             log4net.Config.XmlConfigurator.Configure(new FileInfo("log.config"));
 
             if (!Directory.Exists(Var.OutputDir))
@@ -18,13 +33,11 @@ namespace GDSync
             if (!Directory.Exists(Var.LogDir))
                 Directory.CreateDirectory(Var.LogDir);
 
-            //var service = DriveOp.GetServiceAccountCredential(@"D:\Code\personal\GDSync\GDSync\bin\Debug\account\sa\5db349b5239a0df6ec27472e2cfc0dcbc40f3168.json");
-            //DriveOp.Move(service, "1VOO-BA09rpd83EWEKYakkvMuDqm_-5CL", "1VgSPBWzPA56N82UXJNywkkBOr7i3m-lg", "1NsKygblCLNYvp3uymoO_zdUyiGRK6YPN");
-
-
 
             var exitCode = -1;
-            exitCode = Parser.Default.ParseArguments<DisplayOptions, SaveOptions, SyncOptions, ListCurrentOptions, RenameOptions, CheckMissOptions, AnimeSeasonOptions>(args)
+            exitCode = Parser.Default.ParseArguments<DisplayOptions, SaveOptions,
+                SyncOptions, ListCurrentOptions, RenameOptions, CheckMissOptions,
+                SameInfoOptions, AnimeSeasonOptions>(args)
             .MapResult(
                 (DisplayOptions o) => DisplaySolution(o),
                 (ListCurrentOptions o) => ListCurrentSolution(o),
@@ -32,12 +45,14 @@ namespace GDSync
                 (SyncOptions o) => SyncSolution(o),
                 (RenameOptions o) => RenameSolution(o),
                 (CheckMissOptions o) => CheckMissSolution(o),
+                (SameInfoOptions o) => SameInfoSolotion(o),
                 (AnimeSeasonOptions o) => AnimeSeasonSolution(o),
                 error => 1);
 
 
             Console.WriteLine($"\nExitCode: {exitCode}");
             Console.WriteLine("All Finished!");
+            //Console.ReadLine();
         }
     }
 }
