@@ -48,6 +48,22 @@ namespace GDSync
     }
 
 
+    [Verb("save2", HelpText = "转存文件夹")]
+    class Save2Options
+    {
+        [Option('s', "src", Required = true, HelpText = "源文件id")]
+        public IEnumerable<string> SrcIds { get; set; }
+        [Option('d', "dst", Required = true, HelpText = "目标文件夹id")]
+        public string DstId { get; set; }
+        [Option('n', "num-worker", Required = false, HelpText = "工作线程")]
+        public int Num { get; set; } = 1;
+        [Option('a', "account-dir", Required = false, HelpText = "账号文件夹")]
+        public string AccountDir { get; set; } = "./account/sa";
+        [Option('w', "is-show", Required = false, HelpText = "展示信息")]
+        public bool IsShow { get; set; } = true;
+    }
+
+
     [Verb("sync", HelpText = "同步文件夹")]
     class SyncOptions
     {
@@ -188,18 +204,24 @@ namespace GDSync
             DriveTasks.MultiSaveTo(src_uid_list, dst_uid, num);
             foreach (var src_uid in src_uid_list)
             {
-                Console.WriteLine($"the destination folder https://drive.google.com/drive/u/0/folders/{Global.UidFolderPairs[src_uid]}");
+                if (Global.UidFolderPairs.ContainsKey(src_uid))
+                {
+                    Console.WriteLine($"the destination folder https://drive.google.com/drive/u/0/folders/{Global.UidFolderPairs[src_uid]}");
+                }
             }
 
             if (is_show)
             {
                 foreach (var src_uid in src_uid_list)
                 {
-                    var result = Global.DisplayFolder(src_uid);
-                    result.FolderName = Global.UidDriveFileInfoPairs[src_uid].Name;
-                    string JsonString = JsonConvert.SerializeObject(result, Formatting.Indented);
-                    Console.WriteLine(JsonString);
-                    Console.WriteLine("****************************************************");
+                    if (Global.UidFolderPairs.ContainsKey(src_uid))
+                    {
+                        var result = Global.DisplayFolder(src_uid);
+                        result.FolderName = Global.UidDriveFileInfoPairs[src_uid].Name;
+                        string JsonString = JsonConvert.SerializeObject(result, Formatting.Indented);
+                        Console.WriteLine(JsonString);
+                        Console.WriteLine("****************************************************");
+                    }
                 }
             }
 

@@ -320,10 +320,18 @@ namespace GDSync.core
         {
             var result = DriveOp.GetDriveFileInfo(card.Service, src_uid);
             var file_info = new DriveFileInfo(result);
-            Var.logger.Info($"(worker id: {Thread.CurrentThread.ManagedThreadId}) get folder information: {file_info.Name}({file_info.Uid}), and then will search the folder");
-
             Global.AddDriveFileInfo(file_info);
-            Global.AddFolderPair(file_info.Parent, dst_uid);
+
+
+            if (file_info.IsFolder)
+            {
+                Var.logger.Info($"(worker id: {Thread.CurrentThread.ManagedThreadId}) get folder information: {file_info.Name}({file_info.Uid}), and then will search the folder");
+                Global.AddFolderPair(file_info.Parent, dst_uid);
+            }
+            else
+            {
+                Var.logger.Info($"(worker id: {Thread.CurrentThread.ManagedThreadId}) get file information: {file_info.Name}({file_info.Uid}).");
+            }
         }
 
 
@@ -331,7 +339,9 @@ namespace GDSync.core
         {
             List<DriveAction> ActionList = new List<DriveAction>();
             var file_info = Global.UidDriveFileInfoPairs[src_uid];
-            ActionList.Add(new CreateFolderAction(file_info));
+            if (file_info.IsFolder) { ActionList.Add(new CreateFolderAction(file_info)); }
+            else { ActionList.Add(new CopyFileToAction(file_info, dst_uid)); }
+
 
             return ActionList;
         }
